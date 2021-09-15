@@ -22,7 +22,9 @@ module.exports.index = async (event) => {
     this.table = "Entity-dev"
     this.meter = {
         pk: `meter-${this.uuid}`,
-        sk: this.data.customer.id
+        sk: this.data.customer.id,
+        "gsi1-pk": this.instId,
+        "gsi1-sk": `meter-${this.uuid}`
     }
     this.params = {
         TableName: this.table,
