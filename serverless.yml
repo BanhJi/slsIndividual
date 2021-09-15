@@ -1,0 +1,223 @@
+service: lambda
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  lambdaHashingVersion: 20201221
+  versionFunctions: false
+  stage: dev
+  region: us-east-1
+  environment:
+    database: Entity-${opt:stage, self:provider.stage}
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "dynamodb:*"
+          Resource:
+            - "*"
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource: "*"
+  # vpc:
+  #   securityGroupIds:
+  #     -
+  #   subnetIds:
+  #     -
+  #     -
+
+# you can add packaging information here
+package:
+  individually: true
+  patterns:
+    - "!**/*"
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  domains:
+    prod: apis.banhji.com
+    dev: sandbox.banhji.com
+  customDomain:
+    domainName: ${self:custom.domains.${self:custom.stage}}
+    stage: ${opt:stage, self:provider.stage}
+    basePath: 'utibills'
+    certificateName: '*.banhji.com'
+    createRoute53Record: true
+    # allowPathMatching: true
+
+plugins:
+  - serverless-domain-manager
+  - serverless-offline
+
+functions:
+  meterGet:
+    handler: meter/get.index
+    package:
+      patterns:
+        - src/**
+        - meter/get.js
+      individually: true
+    events:
+      - http:
+          path: /meters/{id}
+          method: get
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+  meterGetAll:
+    handler: meter/getAll.index
+    package:
+      patterns:
+        - src/**
+        - meter/getAll.js
+      individually: true
+    events:
+      - http:
+          path: institutes/{id}/meters
+          method: get
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+  meterAdd:
+    handler: meter/add.index
+    package:
+      patterns:
+        - src/**
+        - node_modules/uuid/**
+        - meter/add.js
+      individually: true
+    events:
+      - http:
+          path: institutes/{id}/meters
+          method: post
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+  meterUpdate:
+    handler: meter/update.index
+    package:
+      patterns:
+        - src/**
+      individually: true
+  meterDelete:
+    handler: meter/delete.index
+    package:
+      patterns:
+        - src/**
+      individually: true
+  customerAdd:
+    handler: customer/add.index
+    package:
+      patterns:
+        - src/**
+        - node_modules/uuid/**
+        - customer/add.js
+      individually: true
+    events:
+      - http:
+          path: institutes/{id}/customers
+          method: post
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+  addMeterToCustomer:
+    handler: customer/addMeter.js
+    description: "Add meter to customer"
+    package:
+      patters:
+        - src/**
+        - node_modules/uuid/**
+        - customer/addMeter.js
+    events:
+      - http:
+          path: institutes/{id}/customers/{cid}/meters
+          method: post
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+                cid: true
+  removeMeterFromCustomer:
+    handler: customer/removeMeter.js
+    description: "Remove meter from customer"
+    package:
+      patters:
+        - src/**
+        - node_modules/uuid/**
+        - customer/removeMeter.js
+    events:
+      - http:
+          path: institutes/{id}/customers/{cid}/meters/{mid}
+          method: delete
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+                cid: true
+                mid: true
+  customerGet:
+    handler: customer/get.index
+    package:
+      patterns:
+        - src/**
+        - node_modules/uuid/**
+        - customer/get.js
+      individually: true
+    events:
+      - http:
+          path: institutes/{id}/customers/{cid}
+          method: get
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+                cid: true
+  customerGetAll:
+    handler: customer/getAll.index
+    package:
+      patterns:
+        - src/**
+        - node_modules/uuid/**
+        - customer/getAll.js
+      individually: true
+    events:
+      - http:
+          path: institutes/{id}/customers
+          method: get
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+  instituteGet:
+    handler: institute/get.index
+    package:
+      patterns:
+        - src/**
+        - institute/get.js
+      individually: true
+    events:
+      - http:
+          path: /institutes/{id}
+          method: get
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+

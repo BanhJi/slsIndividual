@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "pwa-node",
+            "request": "launch",
+            "name": "Serverless Debug",
+            "program": "${workspaceFolder}/node_modules/serverless/bin/serverless",
+            "args": ["offline", "start", "--httpPort", "4000", "--noTimeout"],
+            "protocol": "inspector",
+            "runtimeExecutable": "node"
+        }
+    ]
+}
