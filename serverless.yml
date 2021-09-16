@@ -133,7 +133,7 @@ functions:
               paths:
                 id: true
   addMeterToCustomer:
-    handler: customer/addMeter.js
+    handler: customer/addMeter.index
     description: "Add meter to customer"
     package:
       patters:
