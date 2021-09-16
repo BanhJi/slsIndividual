@@ -11,3 +11,13 @@ function dbInit(region = null) {
 exports.dbClient = (regionName = null) => {
     return dbInit(regionName)
 }
+
+exports.localhost = () => {
+    AWS.config.update({
+        region: 'localhost',
+        endpoint: 'http://localhost:8000',
+        accessKeyId: 'saxsj',
+        secretAccessKey: 'hz11g'
+    })
+    return new AWS.DynamoDB.DocumentClient()
+}
